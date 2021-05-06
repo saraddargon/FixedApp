@@ -1,4 +1,4 @@
-import 'package:fixapp/components/LastCheckData.dart';
+import 'package:fixapp/components/lastCheckData.dart';
 import 'package:fixapp/components/buttonCheck.dart';
 import 'package:fixapp/components/buttonLoad.dart';
 import 'package:fixapp/components/buttonLoadData.dart';
@@ -37,6 +37,7 @@ class _FxApp02State extends State<FxApp02> {
                   ),
                 ),
                 child: SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     horizontal: 35,
                     vertical: 20,
