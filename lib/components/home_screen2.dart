@@ -5,6 +5,7 @@ import 'package:fixapp/components/buttonLoadData.dart';
 import 'package:fixapp/components/buttonSetup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fixapp/global.dart';
 
 class FxApp02 extends StatefulWidget {
   FxApp02({Key key}) : super(key: key);
@@ -14,6 +15,7 @@ class FxApp02 extends StatefulWidget {
 }
 
 class _FxApp02State extends State<FxApp02> {
+  DBData dbs = DBData();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +49,7 @@ class _FxApp02State extends State<FxApp02> {
                     children: <Widget>[
                       SizedBox(height: 40),
                       Text(
-                        'Fixed Assets V.1.0',
+                        '${dbs.versoin}',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 30,
@@ -60,9 +62,9 @@ class _FxApp02State extends State<FxApp02> {
                       LastCheckData(),
                       SizedBox(height: 30),
                       ButtonLoadData(),
-                      //SizedBox(height: 20),
+                      ////SizedBox(height: 20),
                       ButtonCheck(),
-                      // SizedBox(height: 20),
+                      //// SizedBox(height: 20),
                       ButtonSetup(),
                       SizedBox(
                         height: 30,

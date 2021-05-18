@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fixapp/global.dart';
 
 class LastCheckData extends StatelessWidget {
-  const LastCheckData({Key key}) : super(key: key);
+  //const LastCheckData({Key key}) : super(key: key);
 
+  DBData dbs = DBData();
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -17,7 +19,7 @@ class LastCheckData extends StatelessWidget {
           ),
         ),
         Text(
-          'CK2021-0001',
+          '${dbs.CheckNo}',
           style: TextStyle(
             color: Colors.blue,
             fontSize: 16,

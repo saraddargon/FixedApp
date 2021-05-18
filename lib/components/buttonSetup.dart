@@ -1,3 +1,4 @@
+import 'package:fixapp/components/listCheckFixed.dart';
 import 'package:flutter/material.dart';
 //import 'package:fixapp/components/staticClass.dart';
 
@@ -12,7 +13,12 @@ class ButtonSetup extends StatelessWidget {
       // ignore: deprecated_member_use
       child: RaisedButton(
         elevation: 5,
-        onPressed: () => print('3. Config Data'),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ListCheckFixedAsset()),
+          );
+        },
         padding: EdgeInsets.all(20),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -23,7 +29,7 @@ class ButtonSetup extends StatelessWidget {
           children: <Widget>[
             Icon(Icons.settings),
             Text(
-              '  3. Config. Data',
+              '  3. List check Data',
               style: TextStyle(
                 color: Color(0xff5ac18e),
                 fontSize: 24,

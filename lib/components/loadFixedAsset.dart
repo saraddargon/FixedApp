@@ -1,8 +1,61 @@
 import 'package:fixapp/components/home_screen2.dart';
+import 'package:fixapp/global.dart';
+import 'package:fixapp/models/checkNoList.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+_showMaterialDialog(BuildContext context, String _value1) {
+  showDialog(
+    context: context,
+    builder: (_) => new AlertDialog(
+      title: new Text("Check No. Invalid!"),
+      content: new Text("Please.. ${_value1} on Server!"),
+      actions: <Widget>[
+        FlatButton(
+          child: Text('Close'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        )
+      ],
+    ),
+  );
+}
+
+Future<void> getCheckNo(BuildContext context, String _value1) async {
+  DBData dbs = DBData();
+
+  var url = dbs.UrlCheckNo + '' + _value1;
+  try {
+    //print(url);
+    var resp = await http.get(Uri.parse(url));
+    if (resp.statusCode == 200) {
+      List<dynamic> data = jsonDecode(resp.body);
+      List<CheckNoList> data2 =
+          data.map((data) => CheckNoList.fromJson(data)).toList();
+      print(data[0]['CheckNo']);
+      dbs.CheckNo = data[0]['CheckNo'];
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FxApp02(),
+          ));
+    }
+  } catch (error) {
+    dbs.CheckNo = "Error";
+    _showMaterialDialog(context, _value1);
+    //throw Exception("Exception occured: $error");
+  }
+}
 
 Widget buildCheckNo(BuildContext context) {
+  DBData dbs = DBData();
+
+  final _checkNo = TextEditingController();
+  // print(dbs.CheckNo);
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
@@ -29,6 +82,7 @@ Widget buildCheckNo(BuildContext context) {
             ]),
         height: 60,
         child: TextField(
+          controller: _checkNo,
           keyboardType: TextInputType.text,
           style: TextStyle(
             color: Colors.black87,
@@ -61,7 +115,8 @@ Widget buildCheckNo(BuildContext context) {
         child: RaisedButton(
           elevation: 5,
           onPressed: () {
-            print('ss');
+            dbs.CheckNo = "";
+            getCheckNo(context, _checkNo.text);
           },
           padding: EdgeInsets.all(20),
           shape: RoundedRectangleBorder(
@@ -90,10 +145,7 @@ Widget buildCheckNo(BuildContext context) {
         child: FlatButton(
           onPressed: () {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FxApp02(),
-                ));
+                context, MaterialPageRoute(builder: (context) => FxApp02()));
           },
           child: Text(
             'Back to Home',

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'components/home_screen2.dart';
 
 void main() {
-  //var app2 = FxApp02();
+  //var app2 = FxApp01();
   //var app2 = HomeScreen();
   var app2 = MainData();
   runApp(app2);
