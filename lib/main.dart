@@ -8,6 +8,7 @@ void main() {
   runApp(app2);
 }
 
+//StatefulWidget
 class MainData extends StatelessWidget {
   const MainData({Key key}) : super(key: key);
 

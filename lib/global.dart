@@ -14,24 +14,29 @@ class DBData {
 ////////////////////////////CheckNo
   static String _checkNo = "";
 
-  String get CheckNo => _checkNo;
-  set CheckNo(String checkNo) {
+  // ignore: unnecessary_getters_setters
+  String get checkNo => _checkNo;
+  // ignore: unnecessary_getters_setters
+  set checkNo(String checkNo) {
     _checkNo = checkNo;
   }
   /////////////////////////AssetCode
 
   static String _assetCode = "";
-  String get AssetCode => _assetCode;
-  set AssetCode(String assetCode) {
+  // ignore: unnecessary_getters_setters
+  String get assetCode => _assetCode;
+  // ignore: unnecessary_getters_setters
+  set assetCode(String assetCode) {
     _assetCode = assetCode;
   }
 
   ///////////////////Url CheckNo
-  static String _url = "http://10.0.2.2:8090/";
-  String get Url => _url;
+  static String _url = "http://1.179.133.222:8090/"; //"http://10.0.2.2:8090/";
+  String get url => _url;
   //////////////////Url ...
-  static String _urlCheckNo = "http://10.0.2.2:8090/api/checkNo/";
-  String get UrlCheckNo => _urlCheckNo;
+  static String _urlCheckNo = "http://1.179.133.222:8090/api/CheckNo/";
+  //"http://10.0.2.2:8090/api/checkNo/";
+  String get urlCheckNo => _urlCheckNo;
   //////////////////Url ...
   ///
   ///

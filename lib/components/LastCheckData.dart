@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fixapp/global.dart';
 
+// ignore: must_be_immutable
 class LastCheckData extends StatelessWidget {
   //const LastCheckData({Key key}) : super(key: key);
 
@@ -19,7 +20,7 @@ class LastCheckData extends StatelessWidget {
           ),
         ),
         Text(
-          '${dbs.CheckNo}',
+          '${dbs.checkNo}',
           style: TextStyle(
             color: Colors.blue,
             fontSize: 16,

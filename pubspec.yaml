@@ -3,7 +3,7 @@ description: For Fixasset Ryobi 2021.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: 'hhl' # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -39,6 +39,8 @@ dependencies:
   json_serializable: ^3.5.1
   build_runner: ^1.11.5
   analyzer: ^0.41.2
+  intl: ^0.17.0
+  flutter_barcode_scanner: ^2.0.0
   
 
 

@@ -1,5 +1,5 @@
+import 'package:fixapp/components/BarcodeScan.dart';
 import 'package:flutter/material.dart';
-//import 'package:fixapp/components/staticClass.dart';
 
 class ButtonCheck extends StatelessWidget {
   // const buttonCheck({Key key}) : super(key: key);
@@ -12,7 +12,12 @@ class ButtonCheck extends StatelessWidget {
       // ignore: deprecated_member_use
       child: RaisedButton(
         elevation: 5,
-        onPressed: () => print('2. Check Fixed Asset'),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => BarcodeScan()),
+          );
+        },
         padding: EdgeInsets.all(20),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),

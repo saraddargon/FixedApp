@@ -16,7 +16,7 @@ class ButtonSetup extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ListCheckFixedAsset()),
+            MaterialPageRoute(builder: (context) => ListCheckFxAss()),
           );
         },
         padding: EdgeInsets.all(20),
