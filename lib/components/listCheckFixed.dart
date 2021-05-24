@@ -36,7 +36,7 @@ class _ListCheckFxAssState extends State<ListCheckFxAss> {
         ],
       ),
       body: Center(
-        child: JobsListViewDb(),
+        child: JobListViewData(),
       ),
     );
   }

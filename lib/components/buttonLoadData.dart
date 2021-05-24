@@ -1,12 +1,7 @@
-import 'package:fixapp/components/LoadFixedAsset.dart';
-//import 'package:fixapp/management/sqldb.dart';
+import 'package:fixapp/components/loadFixedAsset.dart';
 import 'package:flutter/material.dart';
-//import 'package:fixapp/components/staticClass.dart';
 
 class ButtonLoadData extends StatelessWidget {
-  //const ButtonLoadData({Key key}) : super(key: key);
-  //DBClass dbClass;
-  //Sqlmanagement _db = Sqlmanagement();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -18,7 +13,7 @@ class ButtonLoadData extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => LoadFixedAsset()),
+            MaterialPageRoute(builder: (context) => LoadCheckFixedAsset()),
           );
         },
         padding: EdgeInsets.all(20),

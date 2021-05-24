@@ -1,6 +1,5 @@
-import 'package:fixapp/components/listCheckFixed.dart';
+import 'package:fixapp/components/listCheckFixed_db.dart';
 import 'package:flutter/material.dart';
-//import 'package:fixapp/components/staticClass.dart';
 
 class ButtonSetup extends StatelessWidget {
   const ButtonSetup({Key key}) : super(key: key);
@@ -16,7 +15,7 @@ class ButtonSetup extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ListCheckFxAss()),
+            MaterialPageRoute(builder: (context) => JobListViewData()),
           );
         },
         padding: EdgeInsets.all(20),

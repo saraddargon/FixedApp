@@ -25,6 +25,7 @@ class Job {
   final String lNotStick;
   final String remark;
   final String dept;
+  final String checkby;
 
   Job(
       {this.assetCode,
@@ -42,7 +43,8 @@ class Job {
       this.lNO,
       this.lNotStick,
       this.remark,
-      this.dept});
+      this.dept,
+      this.checkby});
 
   factory Job.fromJson(Map<String, dynamic> json) {
     return Job(
@@ -55,13 +57,59 @@ class Job {
       aUse: json['AUse'],
       aNotUse: json['ANotUse'],
       aDamage: json['ADamage'],
-      aTransfer: json['aTransfer'],
+      aTransfer: json['ATransfer'],
       aLoss: json['ALoss'],
       lOK: json['LOK'],
       lNO: json['LNO'],
       lNotStick: json['LNotStick'],
       remark: json['Remark'],
       dept: json['Dept'],
+      checkby: json['CheckBy'],
+    );
+  }
+}
+
+class JobPost {
+  final String pcheckNo;
+  final String passetCode;
+  final int pinputQty;
+  final String paUse;
+  final String paNotUse;
+  final String paDamage;
+  final String paTransfer;
+  final String paLoss;
+  final String plOK;
+  final String plNO;
+  final String plNotStick;
+  final String premark;
+
+  JobPost(
+      {this.pcheckNo,
+      this.passetCode,
+      this.pinputQty,
+      this.paUse,
+      this.paNotUse,
+      this.paDamage,
+      this.paTransfer,
+      this.paLoss,
+      this.plOK,
+      this.plNO,
+      this.plNotStick,
+      this.premark});
+  factory JobPost.fromJson(Map<String, dynamic> json) {
+    return JobPost(
+      pcheckNo: json['CheckNo'],
+      passetCode: json['AssetCode'],
+      pinputQty: json['InputQty'],
+      paUse: json['AUse'],
+      paNotUse: json['ANotUse'],
+      paDamage: json['ADamage'],
+      paTransfer: json['ATransfer'],
+      paLoss: json['ALoss'],
+      plOK: json['LOK'],
+      plNO: json['LNO'],
+      plNotStick: json['LNotStick'],
+      premark: json['Remark'],
     );
   }
 }
@@ -74,21 +122,32 @@ class BarcodeScan extends StatefulWidget {
 }
 
 class _BarcodeScanState extends State<BarcodeScan> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   DBData dbs = DBData();
   bool statusErr = false;
+
   String barcode = "";
   String aName = "";
   String tName = "";
   String dName = "";
   String aDate = "";
-  bool aUse = true;
+  bool aUse = false;
   bool aNotUse = false;
   bool aDamage = false;
   bool aLoss = false;
   bool aTransfer = false;
-  bool lOK = true;
+  bool lOK = false;
   bool lNO = false;
   bool lstricker = false;
+  String checkby = "";
+  final snackBar = SnackBar(
+    content: Text(
+      'save data successfully.',
+      style: TextStyle(color: Colors.black),
+    ),
+    duration: Duration(seconds: 1),
+    backgroundColor: Color(0xffE5FFCC),
+  );
   String remark = "";
   final formatter = new NumberFormat("###,###");
   int iQty = 0;
@@ -120,6 +179,7 @@ class _BarcodeScanState extends State<BarcodeScan> {
 
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Check FixedAsset : ' + dbs.checkNo),
         backgroundColor: Colors.blueGrey,
@@ -277,9 +337,197 @@ class _BarcodeScanState extends State<BarcodeScan> {
                   labelText: 'Quantity :',
                   hintText: 'Input Quantity',
                 ),
+                onSubmitted: (String value) {
+                  setState(() {
+                    iQty = int.parse(value);
+                  });
+                },
               ),
               SizedBox(height: 5.00),
-
+              Text(
+                'Status',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 5.00),
+              Row(
+                children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      Text('Use'),
+                      Checkbox(
+                          value: aUse,
+                          onChanged: (bool value) {
+                            setState(() {
+                              aUse = value;
+                              aNotUse = aUse ? false : false;
+                              aDamage = aUse ? false : false;
+                              aTransfer = aUse ? false : false;
+                              aLoss = aUse ? false : false;
+                            });
+                          }),
+                    ],
+                  ),
+                  //2
+                  SizedBox(width: 15),
+                  Column(
+                    children: <Widget>[
+                      Text('Not Use'),
+                      Checkbox(
+                          value: aNotUse,
+                          onChanged: (bool value) {
+                            setState(() {
+                              aNotUse = value;
+                              aUse = aNotUse ? false : false;
+                              aDamage = aNotUse ? false : false;
+                              aTransfer = aNotUse ? false : false;
+                              aLoss = aNotUse ? false : false;
+                            });
+                          }),
+                    ],
+                  ),
+                  //3
+                  SizedBox(width: 15),
+                  Column(
+                    children: <Widget>[
+                      Text('Damage'),
+                      Checkbox(
+                          value: aDamage,
+                          onChanged: (bool value) {
+                            setState(() {
+                              aDamage = value;
+                              aUse = aDamage ? false : false;
+                              aNotUse = aDamage ? false : false;
+                              aTransfer = aDamage ? false : false;
+                              aLoss = aDamage ? false : false;
+                            });
+                          }),
+                    ],
+                  ),
+                  //4
+                  SizedBox(width: 15),
+                  Column(
+                    children: <Widget>[
+                      Text('Transfer'),
+                      Checkbox(
+                          value: aTransfer,
+                          onChanged: (bool value) {
+                            setState(() {
+                              aTransfer = value;
+                              aUse = aTransfer ? false : false;
+                              aNotUse = aTransfer ? false : false;
+                              aDamage = aTransfer ? false : false;
+                              aLoss = aTransfer ? false : false;
+                            });
+                          }),
+                    ],
+                  ),
+                  //2
+                  SizedBox(width: 15),
+                  Column(
+                    children: <Widget>[
+                      Text('Loss'),
+                      Checkbox(
+                          value: aLoss,
+                          onChanged: (bool value) {
+                            setState(() {
+                              aLoss = value;
+                              aUse = aLoss ? false : false;
+                              aNotUse = aLoss ? false : false;
+                              aDamage = aLoss ? false : false;
+                              aTransfer = aLoss ? false : false;
+                            });
+                          }),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 5.00),
+              Text(
+                'Sticker',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Row(
+                children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      Text('OK'),
+                      Checkbox(
+                          value: lOK,
+                          onChanged: (bool value) {
+                            setState(() {
+                              lOK = value;
+                              lNO = lOK ? false : false;
+                              lstricker = lOK ? false : false;
+                            });
+                          }),
+                    ],
+                  ),
+                  //2
+                  SizedBox(width: 20),
+                  Column(
+                    children: <Widget>[
+                      Text('Not OK'),
+                      Checkbox(
+                          value: lNO,
+                          onChanged: (bool value) {
+                            setState(() {
+                              lNO = value;
+                              lOK = lNO ? false : false;
+                              lstricker = lNO ? false : false;
+                            });
+                          }),
+                    ],
+                  ),
+                  //3
+                  SizedBox(width: 20),
+                  Column(
+                    children: <Widget>[
+                      Text('No Sticker'),
+                      Checkbox(
+                          value: lstricker,
+                          onChanged: (bool value) {
+                            setState(() {
+                              lstricker = value;
+                              lOK = lstricker ? false : false;
+                              lNO = lstricker ? false : false;
+                            });
+                          }),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 5.00),
+              TextField(
+                controller: TextEditingController(text: remark),
+                //maxLines: null,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                ),
+                decoration: const InputDecoration(
+                  //fillColor: Colors.green.shade50,
+                  border: const UnderlineInputBorder(),
+                  filled: true,
+                  enabled: true,
+                  icon: const Icon(
+                    Icons.insert_comment,
+                    color: Color(0xff5ac18e),
+                    size: 30.0,
+                  ),
+                  labelText: 'Remark :',
+                ),
+                onSubmitted: (String value) {
+                  setState(() {
+                    remark = value;
+                  });
+                },
+              ),
               /*
               SizedBox(height: 5.00),
               SizedBox(
@@ -346,27 +594,34 @@ class _BarcodeScanState extends State<BarcodeScan> {
     if (dbs.checkNo != "" && dbs.checkNo != "Error") {
       if (_value == 'SCANQR') {
         _value = await FlutterBarcodeScanner.scanBarcode(
-            "#ff6666", "Cancel", true, ScanMode.DEFAULT);
+            "#ff6666", "Cancel", true, ScanMode.QR);
       }
 
       if (_value == 'SCANQR') {
         _value = '';
       }
-      print(_value);
-      setState(() {
-        if (_value != '-1') {
+      // print(_value);
+
+      if (_value != '-1') {
+        setState(() {
           barcode = _value;
           sStatus = "Checked Completed.";
           statusErr = false;
-          ////Start////////
-          _clearData();
-          _fetchJobs(_value);
-          ///////end//////////
-        } else {
+        });
+        barcode = _value;
+        ////Start////////
+        await _clearData();
+        await _fetchJobs(_value);
+
+        ///////end//////////
+      } else {
+        setState(() {
           statusErr = true;
           sStatus = "Barcode Invalid!";
-        }
-      });
+        });
+      }
+      //after read.
+
     } else {
       setState(() {
         statusErr = true;
@@ -376,38 +631,48 @@ class _BarcodeScanState extends State<BarcodeScan> {
   }
 
   void _onItemTapped(int index) {
+    _selectedIndex = index;
     setState(() {
       _selectedIndex = index;
-      if (index == 1) {
-        statusErr = false;
-        getDataDisplay("SCANQR");
-      } else if (index == 2) {
-        _clearData();
-      } else if (index == 0) {
-        print('object');
-      }
     });
+
+    if (index == 1) {
+      statusErr = false;
+      getDataDisplay("SCANQR");
+    } else if (index == 2) {
+      _clearData();
+    } else if (index == 0) {
+      createJobPost();
+    }
   }
 
-  void _clearData() {
+  void showInSnackBar(String value) {
+    // ignore: deprecated_member_use
+    _scaffoldKey.currentState.showSnackBar(snackBar);
+  }
+
+  Future<String> _clearData() async {
     setState(() {
+      barcode = "";
       statusErr = false;
       sStatus = "";
       aName = "";
       dName = "";
       tName = "";
       aDate = "";
+      checkby = "";
       iQty = 0;
-      aUse = true;
+      aUse = false;
       aNotUse = false;
       aDamage = false;
       aLoss = false;
       aTransfer = false;
-      lOK = true;
+      lOK = false;
       lNO = false;
       lstricker = false;
       remark = "";
     });
+    return "";
   }
 
   Future<void> _fetchJobs(String _value) async {
@@ -420,14 +685,46 @@ class _BarcodeScanState extends State<BarcodeScan> {
         List<Job> jsb =
             jsonResponse.map((job) => new Job.fromJson(job)).toList();
         jsb.forEach((element) {
-          print(element.dept);
-          print(element.assetCode);
+          //print(element.dept);
+          // print(element.assetCode);
+          barcode = element.assetCode;
           aName = element.assetName;
           dName = element.dept;
           tName = element.thaiName;
           aName = aName + '\n' + tName;
           aDate = element.purchaseDate;
           iQty = element.inputQty;
+          aUse = false;
+          aNotUse = false;
+          aDamage = false;
+          aLoss = false;
+          aTransfer = false;
+          lOK = false;
+          lNO = false;
+          lstricker = false;
+          remark = element.remark;
+          aUse = element.aUse == 'P' ? true : false;
+          aNotUse = element.aNotUse == 'P' ? true : false;
+          aDamage = element.aDamage == 'P' ? true : false;
+          aTransfer = element.aTransfer == 'P' ? true : false;
+          aLoss = element.aLoss == 'P' ? true : false;
+          lOK = element.lOK == 'P' ? true : false;
+          lNO = element.lNO == 'P' ? true : false;
+          lstricker = element.lNotStick == 'P' ? true : false;
+          // print(aTransfer);
+          //print(element.aTransfer);
+          //print('sss');
+          if (element.checkby == '') {
+            setState(() {
+              aUse = true;
+              lOK = true;
+            });
+          } else {
+            setState(() {
+              statusErr = false;
+              sStatus = "Checked already!";
+            });
+          }
         });
       } else {
         //throw Exception('Failed to load Data from API');
@@ -439,6 +736,51 @@ class _BarcodeScanState extends State<BarcodeScan> {
     }
   }
 
-  //////////////////////////End Fuction/////////////////////
+  //////////Job Post///
+  Future<void> createJobPost() async {
+    if (dbs.checkNo != '' && barcode != '') {
+      String ckNo = dbs.checkNo;
+      var body = jsonEncode({
+        'CheckNo': '$ckNo',
+        'AssetCode': '$barcode',
+        'InputQty': '$iQty',
+        'AUse': '${aUse == true ? 'P' : ''}',
+        'ANotUse': '${aNotUse == true ? 'P' : ''}',
+        'ADamage': '${aDamage == true ? 'P' : ''}',
+        'ATransfer': '${aTransfer == true ? 'P' : ''}',
+        'ALoss': '${aLoss == true ? 'P' : ''}',
+        'LOK': '${lOK == true ? 'P' : ''}',
+        'LNO': '${lNO == true ? 'P' : ''}',
+        'LNotStick': '${lstricker == true ? 'P' : ''}',
+        'Remark': '$remark'
+      });
 
+      final response = await http.post(
+        Uri.parse(dbs.url + 'api/checkup'),
+        headers: {"Content-Type": "application/json"},
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        // If the server did return a 201 CREATED response,
+        // then parse the JSON.
+        showInSnackBar("");
+        // return JobPost.fromJson(jsonDecode(response.body));
+      } else {
+        // If the server did not return a 201 CREATED response,
+        // then throw an exception.
+        //throw Exception('Failed to create album.');
+        setState(() {
+          statusErr = true;
+          sStatus = "Error Can't Post Checked.!!";
+        });
+      }
+    } else {
+      setState(() {
+        statusErr = true;
+        sStatus = "Error Can't Post Checked.!!";
+      });
+    }
+  }
+  //////////////////////////End Fuction/////////////////////
 }
