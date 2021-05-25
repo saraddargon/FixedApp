@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:fixapp/components/home_screen2.dart';
 import 'package:fixapp/global.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ class Job {
   final int inputQty;
   final String checkDate;
   final String checkBy;
+  final String location;
 
   Job(
       {this.checkNo,
@@ -21,7 +23,8 @@ class Job {
       this.thaiName,
       this.inputQty,
       this.checkDate,
-      this.checkBy});
+      this.checkBy,
+      this.location});
 
   factory Job.fromJson(Map<String, dynamic> json) {
     return Job(
@@ -32,6 +35,7 @@ class Job {
       inputQty: json['InputQty'],
       checkDate: json['CheckDate'],
       checkBy: json['CheckBy'],
+      location: json['Location'],
     );
   }
 }
@@ -47,6 +51,7 @@ class _JobListViewDataState extends State<JobListViewData> {
   DBData dbs = DBData();
   int search1 = 0;
   String searchText = "";
+  String dropdownValue = 'Asset Code';
   List<TextEditingController> _controllers = new List();
   @override
   Widget build(BuildContext context) {
@@ -89,12 +94,33 @@ class _JobListViewDataState extends State<JobListViewData> {
           // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
           children: <Widget>[
+            SizedBox(
+                height: 60,
+                child: const DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Color(0xff5ac18e),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Manu',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                )),
+
+            /*
             DrawerHeader(
+              padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: Color(0xff5ac18e),
               ),
               child: Text('Manu'),
             ),
+            */
             ListTile(
               title: Text(
                 'Select ALL',
@@ -166,13 +192,38 @@ class _JobListViewDataState extends State<JobListViewData> {
                 });
               },
             ),
+            Center(
+              child: DropdownButton<String>(
+                value: dropdownValue,
+                icon: const Icon(Icons.arrow_downward),
+                iconSize: 24,
+                elevation: 16,
+                style: const TextStyle(color: Colors.deepPurple),
+                underline: Container(
+                  height: 2,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (String newValue) {
+                  setState(() {
+                    dropdownValue = newValue;
+                  });
+                },
+                items: <String>['Asset Code', 'Location', 'Dept.']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ),
             TextField(
               controller: TextEditingController(text: searchText),
               decoration: const InputDecoration(
                 //fillColor: Colors.green.shade50,
                 border: const UnderlineInputBorder(),
                 filled: true,
-                labelText: 'Search Asset Code. :',
+                labelText: 'Search Data :',
               ),
               onSubmitted: (String value) {
                 setState(() {
@@ -198,8 +249,13 @@ class _JobListViewDataState extends State<JobListViewData> {
       } else if (search1 == 2) {
         jobsListAPIUrl = dbs.url + 'api/checkListall3/' + dbs.checkNo;
       } else if (search1 == 4 && searchText != '') {
-        jobsListAPIUrl =
-            dbs.url + 'api/checkListall4/' + dbs.checkNo + "," + searchText;
+        jobsListAPIUrl = dbs.url +
+            'api/checkListall4/' +
+            dbs.checkNo +
+            "," +
+            searchText +
+            "," +
+            dropdownValue;
       }
 
       final response = await http.get(Uri.parse(jobsListAPIUrl));
@@ -221,7 +277,9 @@ class _JobListViewDataState extends State<JobListViewData> {
               children: <Widget>[
                 _tile(
                   'No. : ' + data[index].assetCode,
-                  data[index].assetName,
+                  data[index].assetName +
+                      '\nLocation : ' +
+                      data[index].location,
                   data[index].thaiName,
                   data[index].checkBy,
                 ),
@@ -244,7 +302,7 @@ class _JobListViewDataState extends State<JobListViewData> {
               fontSize: 18,
             )),
         subtitle: Text(
-          (thainame == '0' || thainame == '') ? subtitle : thainame,
+          subtitle,
           style: TextStyle(
             color: Colors.blueAccent,
             fontSize: 14,
