@@ -15,7 +15,10 @@ class ButtonCheck extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => BarcodeScan()),
+            MaterialPageRoute(
+                builder: (context) => BarcodeScan(
+                      tobj: '',
+                    )),
           );
         },
         padding: EdgeInsets.all(20),

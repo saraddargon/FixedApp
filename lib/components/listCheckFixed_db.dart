@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:fixapp/components/BarcodeScan.dart';
 import 'package:fixapp/components/home_screen2.dart';
 import 'package:fixapp/global.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class Job {
   final String checkNo;
@@ -52,7 +54,7 @@ class _JobListViewDataState extends State<JobListViewData> {
   int search1 = 0;
   String searchText = "";
   String dropdownValue = 'Asset Code';
-  List<TextEditingController> _controllers = new List();
+  //List<TextEditingController> _controllers = new List();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -241,6 +243,9 @@ class _JobListViewDataState extends State<JobListViewData> {
 
   // ignore: missing_return
   Future<List<Job>> _fetchJobs() async {
+    Future.delayed(Duration(milliseconds: 500), () {
+      // Do something
+    });
     DBData dbs = DBData();
     if (dbs.checkNo != '') {
       var jobsListAPIUrl = dbs.url + 'api/checkListall/' + dbs.checkNo;
@@ -269,6 +274,7 @@ class _JobListViewDataState extends State<JobListViewData> {
   }
 
   ListView _jobsListView(data) {
+    final formatter = new NumberFormat("###,###");
     return ListView.builder(
         itemCount: data.length,
         itemBuilder: (context, index) {
@@ -276,12 +282,12 @@ class _JobListViewDataState extends State<JobListViewData> {
             child: Column(
               children: <Widget>[
                 _tile(
-                  'No. : ' + data[index].assetCode,
-                  data[index].assetName +
-                      '\nLocation : ' +
-                      data[index].location,
-                  data[index].thaiName,
+                  formatter.format(index + 1),
+                  ': ' + data[index].assetCode,
+                  data[index].assetName,
+                  data[index].location,
                   data[index].checkBy,
+                  data[index].assetCode,
                 ),
               ],
             ),
@@ -290,19 +296,21 @@ class _JobListViewDataState extends State<JobListViewData> {
   }
 
   ListTile _tile(
+    String rows,
     String title,
     String subtitle,
-    String thainame,
+    String locations,
     String checkBy,
+    String AccCode,
   ) =>
       ListTile(
-        title: Text(title,
+        title: Text(rows + ' ' + title,
             style: TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 18,
             )),
         subtitle: Text(
-          subtitle,
+          subtitle + '\nLocation: ' + locations,
           style: TextStyle(
             color: Colors.blueAccent,
             fontSize: 14,
@@ -317,5 +325,56 @@ class _JobListViewDataState extends State<JobListViewData> {
           color: checkBy != '' ? Colors.orange : Colors.transparent,
           size: 30,
         ),
+        onTap: () {
+          //print(AccCode);
+          _showMyDialog(AccCode);
+        },
       );
+////dialog//
+  // ignore: non_constant_identifier_names
+  Future<void> _showMyDialog(String AccCode1) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('You want to Open Check Page.'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Text(
+                  'ต้องการไปหน้า Check Page หรือไม่ ?',
+                  style: TextStyle(color: Colors.blue),
+                ),
+
+                ///Text('Would you like to approve of this message?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Confirm'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // print('Confirmed ' + AccCode);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => BarcodeScan(
+                            tobj: AccCode1,
+                          )),
+                );
+              },
+            ),
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

@@ -115,7 +115,9 @@ class JobPost {
 }
 
 class BarcodeScan extends StatefulWidget {
-  BarcodeScan({Key key}) : super(key: key);
+  String tobj = "";
+  BarcodeScan({Key key, @required this.tobj}) : super(key: key);
+  // DetailScreen({Key? key, required this.todo}) : super(key: key);
 
   @override
   _BarcodeScanState createState() => _BarcodeScanState();
@@ -125,7 +127,6 @@ class _BarcodeScanState extends State<BarcodeScan> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   DBData dbs = DBData();
   bool statusErr = false;
-
   String barcode = "";
   String aName = "";
   String tName = "";
@@ -140,6 +141,7 @@ class _BarcodeScanState extends State<BarcodeScan> {
   bool lNO = false;
   bool lstricker = false;
   String checkby = "";
+
   final snackBar = SnackBar(
     content: Text(
       'save data successfully.',
@@ -147,6 +149,14 @@ class _BarcodeScanState extends State<BarcodeScan> {
     ),
     duration: Duration(seconds: 1),
     backgroundColor: Color(0xffE5FFCC),
+  );
+  final snackBarBack = SnackBar(
+    content: Text(
+      'clear data successfully.',
+      style: TextStyle(color: Colors.black),
+    ),
+    duration: Duration(seconds: 1),
+    backgroundColor: Colors.orange.shade200,
   );
   String remark = "";
   final formatter = new NumberFormat("###,###");
@@ -175,6 +185,11 @@ class _BarcodeScanState extends State<BarcodeScan> {
   @override
   initState() {
     super.initState();
+    barcode = widget.tobj;
+    if (barcode != '') {
+      //_clearData();
+      _fetchJobs(barcode);
+    }
   }
 
   Widget build(BuildContext context) {
@@ -183,6 +198,19 @@ class _BarcodeScanState extends State<BarcodeScan> {
       appBar: AppBar(
         title: Text('Check FixedAsset : ' + dbs.checkNo),
         backgroundColor: Colors.blueGrey,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.remove_circle,
+              color: Colors.red.shade200,
+            ),
+            onPressed: () {
+              if (barcode != '') {
+                _showMyDialogClear(barcode);
+              }
+            },
+          )
+        ],
       ),
       body: Center(
         child: Container(
@@ -596,6 +624,9 @@ class _BarcodeScanState extends State<BarcodeScan> {
         _value = await FlutterBarcodeScanner.scanBarcode(
             "#ff6666", "Cancel", true, ScanMode.QR);
       }
+      Future.delayed(Duration(milliseconds: 1000), () {
+        // Do something
+      });
 
       if (_value == 'SCANQR') {
         _value = '';
@@ -610,7 +641,12 @@ class _BarcodeScanState extends State<BarcodeScan> {
         });
         barcode = _value;
         ////Start////////
+
         await _clearData();
+        Future.delayed(Duration(milliseconds: 500), () {
+          // Do something
+        });
+
         await _fetchJobs(_value);
 
         ///////end//////////
@@ -651,6 +687,14 @@ class _BarcodeScanState extends State<BarcodeScan> {
     _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 
+  void setValueAsstCode1(String value) {
+    if (value != '') {
+      setState(() {
+        barcode = value;
+      });
+    }
+  }
+
   Future<String> _clearData() async {
     setState(() {
       barcode = "";
@@ -680,6 +724,7 @@ class _BarcodeScanState extends State<BarcodeScan> {
       final jobsListAPIUrl =
           dbs.url + 'api/CheckNoAd/' + dbs.checkNo + ',' + _value;
       final response = await http.get(Uri.parse(jobsListAPIUrl));
+
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
         List<Job> jsb =
@@ -726,6 +771,9 @@ class _BarcodeScanState extends State<BarcodeScan> {
             });
           }
         });
+        if (jsb.isEmpty) {
+          _showMyDialogErr(_value);
+        }
       } else {
         //throw Exception('Failed to load Data from API');
         setState(() {
@@ -782,5 +830,149 @@ class _BarcodeScanState extends State<BarcodeScan> {
       });
     }
   }
+
+  Future<void> createJobPostBack() async {
+    if (dbs.checkNo != '' && barcode != '') {
+      String ckNo = dbs.checkNo;
+      var body = jsonEncode({
+        'CheckNo': '$ckNo',
+        'AssetCode': '$barcode',
+        'InputQty': '$iQty',
+        'AUse': '${aUse == true ? 'P' : ''}',
+        'ANotUse': '${aNotUse == true ? 'P' : ''}',
+        'ADamage': '${aDamage == true ? 'P' : ''}',
+        'ATransfer': '${aTransfer == true ? 'P' : ''}',
+        'ALoss': '${aLoss == true ? 'P' : ''}',
+        'LOK': '${lOK == true ? 'P' : ''}',
+        'LNO': '${lNO == true ? 'P' : ''}',
+        'LNotStick': '${lstricker == true ? 'P' : ''}',
+        'Remark': '$remark'
+      });
+
+      final response = await http.post(
+        Uri.parse(dbs.url + 'api/checkback'),
+        headers: {"Content-Type": "application/json"},
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        // If the server did return a 201 CREATED response,
+        // then parse the JSON.
+        //showInSnackBar("");
+        _scaffoldKey.currentState.showSnackBar(snackBarBack);
+        // return JobPost.fromJson(jsonDecode(response.body));
+      } else {
+        // If the server did not return a 201 CREATED response,
+        // then throw an exception.
+        //throw Exception('Failed to create album.');
+        setState(() {
+          statusErr = true;
+          sStatus = "Error Can't Post Checked.!!";
+        });
+      }
+    } else {
+      setState(() {
+        statusErr = true;
+        sStatus = "Error Can't Post Checked.!!";
+      });
+    }
+  }
+
   //////////////////////////End Fuction/////////////////////
+  Future<void> _showMyDialogErr(String accCode1) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'AssetCode Can not Found!!' + accCode1,
+            style: TextStyle(color: Colors.red),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Text(
+                  'ไม่มีเลข Fixed Asset Code นี้ใน Check List.',
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
+                ),
+
+                ///Text('Would you like to approve of this message?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  barcode = accCode1;
+                });
+              },
+            ),
+            /*
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              
+            ),
+            */
+          ],
+        );
+      },
+    );
+  }
+
+  //Clear//
+  Future<void> _showMyDialogClear(String accCode1) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'UnChecked \n' + accCode1,
+            style: TextStyle(color: Colors.blue),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Text(
+                  'ยกเลิกการ Checked.',
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
+                ),
+
+                ///Text('Would you like to approve of this message?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Save'),
+              onPressed: () async {
+                // ignore: deprecated_member_use
+                Navigator.of(context).pop();
+
+                await createJobPostBack();
+                await _fetchJobs(accCode1);
+              },
+            ),
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
