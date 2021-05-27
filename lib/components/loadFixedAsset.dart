@@ -233,12 +233,12 @@ class _LoadCheckFixedAssetState extends State<LoadCheckFixedAsset> {
                 color: Color(0xff5ac18e),
               ),
             ),
-            onSubmitted: (String value) {
+            onSubmitted: (String value) async {
               dbs.checkNo = "";
               setState(() {
                 _checkNo = value;
               });
-              getCheckNo(context, value);
+              await getCheckNo(context, value);
             },
           ),
         ),
