@@ -301,7 +301,7 @@ class _JobListViewDataState extends State<JobListViewData> {
     String subtitle,
     String locations,
     String checkBy,
-    String AccCode,
+    String accCode,
   ) =>
       ListTile(
         title: Text(rows + ' ' + title,
@@ -327,7 +327,7 @@ class _JobListViewDataState extends State<JobListViewData> {
         ),
         onTap: () {
           //print(AccCode);
-          _showMyDialog(AccCode);
+          _showMyDialog(accCode);
         },
       );
 ////dialog//
