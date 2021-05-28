@@ -114,6 +114,7 @@ class JobPost {
   }
 }
 
+// ignore: must_be_immutable
 class BarcodeScan extends StatefulWidget {
   String tobj = "";
   BarcodeScan({Key key, @required this.tobj}) : super(key: key);
@@ -859,6 +860,7 @@ class _BarcodeScanState extends State<BarcodeScan> {
         // If the server did return a 201 CREATED response,
         // then parse the JSON.
         //showInSnackBar("");
+        // ignore: deprecated_member_use
         _scaffoldKey.currentState.showSnackBar(snackBarBack);
         // return JobPost.fromJson(jsonDecode(response.body));
       } else {
