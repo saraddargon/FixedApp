@@ -2,7 +2,7 @@ library globals;
 
 class DBData {
 //////////////////////////////Version
-  static String _version = "Fixed Assets V.1.0";
+  static String _version = "Fixed Assets V.1.1";
   set version(String version) {
     _version = version;
   }
@@ -54,7 +54,5 @@ class DBData {
   //"http://10.0.2.2:8090/api/checkNo/";
   String get urlCheckNo => _urlCheckNo;
   //////////////////Url ...
-  ///
-  ///
 
 }
