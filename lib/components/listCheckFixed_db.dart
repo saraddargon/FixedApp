@@ -56,6 +56,11 @@ class _JobListViewDataState extends State<JobListViewData> {
   String dropdownValue = 'Asset Code';
   //List<TextEditingController> _controllers = new List();
   @override
+  initState() {
+    super.initState();
+    //print(dbs.localDb);
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -248,27 +253,31 @@ class _JobListViewDataState extends State<JobListViewData> {
     });
     DBData dbs = DBData();
     if (dbs.checkNo != '') {
-      var jobsListAPIUrl = dbs.url + 'api/checkListall/' + dbs.checkNo;
-      if (search1 == 1) {
-        jobsListAPIUrl = dbs.url + 'api/checkListall2/' + dbs.checkNo;
-      } else if (search1 == 2) {
-        jobsListAPIUrl = dbs.url + 'api/checkListall3/' + dbs.checkNo;
-      } else if (search1 == 4 && searchText != '') {
-        jobsListAPIUrl = dbs.url +
-            'api/checkListall4/' +
-            dbs.checkNo +
-            "," +
-            searchText +
-            "," +
-            dropdownValue;
-      }
+      // dbs.checkwifi();
+      //dbs.wifis = 'No';
+      if (true) {
+        var jobsListAPIUrl = dbs.url + 'api/checkListall/' + dbs.checkNo;
+        if (search1 == 1) {
+          jobsListAPIUrl = dbs.url + 'api/checkListall2/' + dbs.checkNo;
+        } else if (search1 == 2) {
+          jobsListAPIUrl = dbs.url + 'api/checkListall3/' + dbs.checkNo;
+        } else if (search1 == 4 && searchText != '') {
+          jobsListAPIUrl = dbs.url +
+              'api/checkListall4/' +
+              dbs.checkNo +
+              "," +
+              searchText +
+              "," +
+              dropdownValue;
+        }
 
-      final response = await http.get(Uri.parse(jobsListAPIUrl));
-      if (response.statusCode == 200) {
-        List jsonResponse = json.decode(response.body);
-        return jsonResponse.map((job) => new Job.fromJson(job)).toList();
-      } else {
-        throw Exception('Failed to load Data from API');
+        final response = await http.get(Uri.parse(jobsListAPIUrl));
+        if (response.statusCode == 200) {
+          List jsonResponse = json.decode(response.body);
+          return jsonResponse.map((job) => new Job.fromJson(job)).toList();
+        } else {
+          throw Exception('Failed to load Data from API');
+        }
       }
     }
   }

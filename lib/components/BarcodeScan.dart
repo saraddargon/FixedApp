@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:fixapp/global.dart';
+import 'package:fixapp/management/sqldb.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,6 +27,7 @@ class Job {
   final String remark;
   final String dept;
   final String checkby;
+  final int qtyNew;
 
   Job(
       {this.assetCode,
@@ -44,7 +46,8 @@ class Job {
       this.lNotStick,
       this.remark,
       this.dept,
-      this.checkby});
+      this.checkby,
+      this.qtyNew});
 
   factory Job.fromJson(Map<String, dynamic> json) {
     return Job(
@@ -65,6 +68,7 @@ class Job {
       remark: json['Remark'],
       dept: json['Dept'],
       checkby: json['CheckBy'],
+      qtyNew: json['QtyNew'],
     );
   }
 }
@@ -126,6 +130,7 @@ class BarcodeScan extends StatefulWidget {
 
 class _BarcodeScanState extends State<BarcodeScan> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  Sqlmanagement sqm = Sqlmanagement();
   DBData dbs = DBData();
   bool statusErr = false;
   String barcode = "";
@@ -162,6 +167,7 @@ class _BarcodeScanState extends State<BarcodeScan> {
   String remark = "";
   final formatter = new NumberFormat("###,###");
   int iQty = 0;
+  int qtyNew = 0;
   String sStatus = "";
 
   int _selectedIndex = 0;
@@ -343,6 +349,80 @@ class _BarcodeScanState extends State<BarcodeScan> {
                 ),
               ),
               SizedBox(height: 5.00),
+              ///////////start row/////
+              Row(
+                // mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(
+                      width: 150,
+                      child: TextField(
+                        controller: TextEditingController(
+                          text: iQty == 0 ? '' : '   ' + formatter.format(iQty),
+                        ),
+                        keyboardType: TextInputType.number,
+                        //maxLines: null,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                        decoration: const InputDecoration(
+                          //fillColor: Colors.green.shade50,
+                          //border: const UnderlineInputBorder(),
+                          // filled: true,
+                          enabled: true,
+                          icon: const Icon(
+                            Icons.date_range,
+                            color: Color(0xff5ac18e),
+                            size: 30.0,
+                          ),
+                          labelText: 'Quantity :',
+                          hintText: 'Input Quantity',
+                        ),
+                        onSubmitted: (String value) {
+                          setState(() {
+                            iQty = int.parse(value);
+                          });
+                        },
+                      )),
+                  SizedBox(width: 20),
+                  SizedBox(
+                      width: 150,
+                      child: TextField(
+                        controller: TextEditingController(
+                          text: qtyNew == 0
+                              ? ''
+                              : '   ' + formatter.format(qtyNew),
+                        ),
+                        keyboardType: TextInputType.number,
+                        enabled: false,
+                        //maxLines: null,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                        decoration: const InputDecoration(
+                          //fillColor: Colors.green.shade50,
+                          //border: const UnderlineInputBorder(),
+                          // filled: true,
+                          enabled: true,
+                          icon: const Icon(
+                            Icons.task_alt,
+                            color: Colors.blue,
+                            size: 30.0,
+                          ),
+                          labelText: 'Qty Special :',
+                          // hintText: 'Input Quantity',
+                        ),
+                        onSubmitted: (String value) {
+                          setState(() {
+                            qtyNew = int.parse(value);
+                          });
+                        },
+                      )),
+                ],
+              ),
+              ///////////end row///////
+              /*
               TextField(
                 controller: TextEditingController(
                   text: iQty == 0 ? '' : '   ' + formatter.format(iQty),
@@ -372,6 +452,7 @@ class _BarcodeScanState extends State<BarcodeScan> {
                   });
                 },
               ),
+              */
               SizedBox(height: 5.00),
               Text(
                 'Status',
@@ -707,6 +788,7 @@ class _BarcodeScanState extends State<BarcodeScan> {
       aDate = "";
       checkby = "";
       iQty = 0;
+      qtyNew = 0;
       aUse = false;
       aNotUse = false;
       aDamage = false;
@@ -722,65 +804,120 @@ class _BarcodeScanState extends State<BarcodeScan> {
 
   Future<void> _fetchJobs(String _value) async {
     if (dbs.checkNo != '' && _value != '') {
-      final jobsListAPIUrl =
-          dbs.url + 'api/CheckNoAd/' + dbs.checkNo + ',' + _value;
-      final response = await http.get(Uri.parse(jobsListAPIUrl));
+      dbs.checkwifi();
+      // dbs.wifis = 'No';
+      if (dbs.wifis == "Yes") {
+        final jobsListAPIUrl =
+            dbs.url + 'api/CheckNoAd/' + dbs.checkNo + ',' + _value;
+        final response = await http.get(Uri.parse(jobsListAPIUrl));
 
-      if (response.statusCode == 200) {
-        List jsonResponse = json.decode(response.body);
-        List<Job> jsb =
-            jsonResponse.map((job) => new Job.fromJson(job)).toList();
-        jsb.forEach((element) {
-          //print(element.dept);
-          // print(element.assetCode);
-          barcode = element.assetCode;
-          aName = element.assetName;
-          dName = element.dept;
-          tName = element.thaiName;
-          aName = aName + '\n' + tName;
-          aDate = element.purchaseDate;
-          iQty = element.inputQty;
-          aUse = false;
-          aNotUse = false;
-          aDamage = false;
-          aLoss = false;
-          aTransfer = false;
-          lOK = false;
-          lNO = false;
-          lstricker = false;
-          remark = element.remark;
-          aUse = element.aUse == 'P' ? true : false;
-          aNotUse = element.aNotUse == 'P' ? true : false;
-          aDamage = element.aDamage == 'P' ? true : false;
-          aTransfer = element.aTransfer == 'P' ? true : false;
-          aLoss = element.aLoss == 'P' ? true : false;
-          lOK = element.lOK == 'P' ? true : false;
-          lNO = element.lNO == 'P' ? true : false;
-          lstricker = element.lNotStick == 'P' ? true : false;
-          // print(aTransfer);
-          //print(element.aTransfer);
-          //print('sss');
-          if (element.checkby == '') {
-            setState(() {
-              aUse = true;
-              lOK = true;
-            });
-          } else {
-            setState(() {
-              statusErr = false;
-              sStatus = "Checked already!";
-            });
+        if (response.statusCode == 200) {
+          List jsonResponse = json.decode(response.body);
+          List<Job> jsb =
+              jsonResponse.map((job) => new Job.fromJson(job)).toList();
+          jsb.forEach((element) {
+            barcode = element.assetCode;
+            aName = element.assetName;
+            dName = element.dept;
+            tName = element.thaiName;
+            aName = aName + '\n' + tName;
+            aDate = element.purchaseDate;
+            iQty = element.inputQty;
+            qtyNew = element.qtyNew;
+            aUse = false;
+            aNotUse = false;
+            aDamage = false;
+            aLoss = false;
+            aTransfer = false;
+            lOK = false;
+            lNO = false;
+            lstricker = false;
+            remark = element.remark;
+            aUse = element.aUse == 'P' ? true : false;
+            aNotUse = element.aNotUse == 'P' ? true : false;
+            aDamage = element.aDamage == 'P' ? true : false;
+            aTransfer = element.aTransfer == 'P' ? true : false;
+            aLoss = element.aLoss == 'P' ? true : false;
+            lOK = element.lOK == 'P' ? true : false;
+            lNO = element.lNO == 'P' ? true : false;
+            lstricker = element.lNotStick == 'P' ? true : false;
+
+            if (element.checkby == '') {
+              setState(() {
+                aUse = true;
+                lOK = true;
+              });
+            } else {
+              setState(() {
+                statusErr = false;
+                sStatus = "Checked already!";
+              });
+            }
+          });
+          if (jsb.isEmpty) {
+            _showMyDialogErr(_value);
           }
-        });
-        if (jsb.isEmpty) {
-          _showMyDialogErr(_value);
+        } else {
+          //throw Exception('Failed to load Data from API');
+          setState(() {
+            statusErr = true;
+            sStatus = "Error Check No or Asset Code Empty!!";
+          });
         }
       } else {
-        //throw Exception('Failed to load Data from API');
-        setState(() {
-          statusErr = true;
-          sStatus = "Error Check No or Asset Code Empty!!";
-        });
+        //offline//
+        List<SfxAsset> sq = await sqm.getTemp2Item(dbs.checkNo, _value);
+        // print('test wifi => ' + sq.length.toString());
+        if (sq.length > 0) {
+          sq.forEach((element) {
+            barcode = element.assetCode;
+            aName = element.assetName;
+            dName = element.dept;
+            tName = element.thaiName;
+            aName = aName + '\n' + tName;
+            aDate = element.checkDate;
+            iQty = element.inputQty;
+            qtyNew = element.qtyNew;
+            aUse = false;
+            aNotUse = false;
+            aDamage = false;
+            aLoss = false;
+            aTransfer = false;
+            lOK = false;
+            lNO = false;
+            lstricker = false;
+            remark = element.remark;
+            aUse = element.aUse == 'P' ? true : false;
+            aNotUse = element.aNotUse == 'P' ? true : false;
+            aDamage = element.aDamage == 'P' ? true : false;
+            aTransfer = element.aTransfer == 'P' ? true : false;
+            aLoss = element.aLoss == 'P' ? true : false;
+            lOK = element.lOK == 'P' ? true : false;
+            lNO = element.lNO == 'P' ? true : false;
+            lstricker = element.lNotStick == 'P' ? true : false;
+
+            if (element.checkPoint == '') {
+              setState(() {
+                aUse = true;
+                lOK = true;
+              });
+            } else {
+              setState(() {
+                statusErr = false;
+                sStatus = "Checked already!";
+              });
+            }
+          });
+          if (sq.isEmpty) {
+            _showMyDialogErr(_value);
+          }
+        } else {
+          //throw Exception('Failed to load Data from API');
+          setState(() {
+            statusErr = true;
+            sStatus = "Error Check No or Asset Code Empty!!";
+          });
+        }
       }
     }
   }
@@ -789,40 +926,73 @@ class _BarcodeScanState extends State<BarcodeScan> {
   Future<void> createJobPost() async {
     if (dbs.checkNo != '' && barcode != '') {
       String ckNo = dbs.checkNo;
-      var body = jsonEncode({
-        'CheckNo': '$ckNo',
-        'AssetCode': '$barcode',
-        'InputQty': '$iQty',
-        'AUse': '${aUse == true ? 'P' : ''}',
-        'ANotUse': '${aNotUse == true ? 'P' : ''}',
-        'ADamage': '${aDamage == true ? 'P' : ''}',
-        'ATransfer': '${aTransfer == true ? 'P' : ''}',
-        'ALoss': '${aLoss == true ? 'P' : ''}',
-        'LOK': '${lOK == true ? 'P' : ''}',
-        'LNO': '${lNO == true ? 'P' : ''}',
-        'LNotStick': '${lstricker == true ? 'P' : ''}',
-        'Remark': '$remark'
-      });
-
-      final response = await http.post(
-        Uri.parse(dbs.url + 'api/checkup'),
-        headers: {"Content-Type": "application/json"},
-        body: body,
-      );
-
-      if (response.statusCode == 200) {
-        // If the server did return a 201 CREATED response,
-        // then parse the JSON.
-        showInSnackBar("");
-        // return JobPost.fromJson(jsonDecode(response.body));
-      } else {
-        // If the server did not return a 201 CREATED response,
-        // then throw an exception.
-        //throw Exception('Failed to create album.');
-        setState(() {
-          statusErr = true;
-          sStatus = "Error Can't Post Checked.!!";
+      dbs.checkwifi();
+      // dbs.wifis = 'No';
+      if (dbs.wifis == "Yes") {
+        var body = jsonEncode({
+          'CheckNo': '$ckNo',
+          'AssetCode': '$barcode',
+          'InputQty': '$iQty',
+          'AUse': '${aUse == true ? 'P' : ''}',
+          'ANotUse': '${aNotUse == true ? 'P' : ''}',
+          'ADamage': '${aDamage == true ? 'P' : ''}',
+          'ATransfer': '${aTransfer == true ? 'P' : ''}',
+          'ALoss': '${aLoss == true ? 'P' : ''}',
+          'LOK': '${lOK == true ? 'P' : ''}',
+          'LNO': '${lNO == true ? 'P' : ''}',
+          'LNotStick': '${lstricker == true ? 'P' : ''}',
+          'Remark': '$remark',
+          'CheckBy': '${dbs.users}'
         });
+
+        final response = await http.post(
+          Uri.parse(dbs.url + 'api/checkup'),
+          headers: {"Content-Type": "application/json"},
+          body: body,
+        );
+
+        if (response.statusCode == 200) {
+          // If the server did return a 201 CREATED response,
+          // then parse the JSON.
+          //print(body);
+          showInSnackBar("");
+          // return JobPost.fromJson(jsonDecode(response.body));
+        } else {
+          // If the server did not return a 201 CREATED response,
+          // then throw an exception.
+          //throw Exception('Failed to create album.');
+          setState(() {
+            statusErr = true;
+            sStatus = "Error Can't Post Checked.!!";
+          });
+        }
+      } else {
+        //offline Update//
+        var sqlc = "update Temp2 set ";
+        sqlc += " Ause='${aUse == true ? 'P' : ''}'";
+        sqlc += ",ANotUse='${aNotUse == true ? 'P' : ''}'";
+        sqlc += ",ADamage='${aDamage == true ? 'P' : ''}'";
+        sqlc += ",ALoss='${aLoss == true ? 'P' : ''}'";
+        sqlc += ",ATransfer='${aTransfer == true ? 'P' : ''}'";
+        sqlc += ",LOK='${lOK == true ? 'P' : ''}'";
+        sqlc += ",LNO='${lNO == true ? 'P' : ''}'";
+        sqlc += ",LNotStick='${lstricker == true ? 'P' : ''}'";
+        sqlc += ",Remark='$remark'";
+        sqlc += ",CheckBy='" + dbs.users + "'";
+        sqlc += ",CheckPoint='Check'";
+        sqlc += ",InputQty=" + iQty.toString();
+        sqlc += " where CheckNo='" + dbs.checkNo + "'";
+        sqlc += " and AssetCode='" + barcode + "'";
+
+        //print(sqlc);
+        if (await sqm.updateTemp2(sqlc) > 0) {
+          showInSnackBar("");
+        } else {
+          setState(() {
+            statusErr = true;
+            sStatus = "Error Can't Post Checked.!!";
+          });
+        }
       }
     } else {
       setState(() {
@@ -835,42 +1005,74 @@ class _BarcodeScanState extends State<BarcodeScan> {
   Future<void> createJobPostBack() async {
     if (dbs.checkNo != '' && barcode != '') {
       String ckNo = dbs.checkNo;
-      var body = jsonEncode({
-        'CheckNo': '$ckNo',
-        'AssetCode': '$barcode',
-        'InputQty': '$iQty',
-        'AUse': '${aUse == true ? 'P' : ''}',
-        'ANotUse': '${aNotUse == true ? 'P' : ''}',
-        'ADamage': '${aDamage == true ? 'P' : ''}',
-        'ATransfer': '${aTransfer == true ? 'P' : ''}',
-        'ALoss': '${aLoss == true ? 'P' : ''}',
-        'LOK': '${lOK == true ? 'P' : ''}',
-        'LNO': '${lNO == true ? 'P' : ''}',
-        'LNotStick': '${lstricker == true ? 'P' : ''}',
-        'Remark': '$remark'
-      });
-
-      final response = await http.post(
-        Uri.parse(dbs.url + 'api/checkback'),
-        headers: {"Content-Type": "application/json"},
-        body: body,
-      );
-
-      if (response.statusCode == 200) {
-        // If the server did return a 201 CREATED response,
-        // then parse the JSON.
-        //showInSnackBar("");
-        // ignore: deprecated_member_use
-        _scaffoldKey.currentState.showSnackBar(snackBarBack);
-        // return JobPost.fromJson(jsonDecode(response.body));
-      } else {
-        // If the server did not return a 201 CREATED response,
-        // then throw an exception.
-        //throw Exception('Failed to create album.');
-        setState(() {
-          statusErr = true;
-          sStatus = "Error Can't Post Checked.!!";
+      dbs.checkwifi();
+      // dbs.wifis = 'No';
+      if (dbs.wifis == "Yes") {
+        var body = jsonEncode({
+          'CheckNo': '$ckNo',
+          'AssetCode': '$barcode',
+          'InputQty': '$iQty',
+          'AUse': '${aUse == true ? 'P' : ''}',
+          'ANotUse': '${aNotUse == true ? 'P' : ''}',
+          'ADamage': '${aDamage == true ? 'P' : ''}',
+          'ATransfer': '${aTransfer == true ? 'P' : ''}',
+          'ALoss': '${aLoss == true ? 'P' : ''}',
+          'LOK': '${lOK == true ? 'P' : ''}',
+          'LNO': '${lNO == true ? 'P' : ''}',
+          'LNotStick': '${lstricker == true ? 'P' : ''}',
+          'Remark': '$remark',
+          'CheckBy': '$dbs.users'
         });
+
+        final response = await http.post(
+          Uri.parse(dbs.url + 'api/checkback'),
+          headers: {"Content-Type": "application/json"},
+          body: body,
+        );
+
+        if (response.statusCode == 200) {
+          // If the server did return a 201 CREATED response,
+          // then parse the JSON.
+          //showInSnackBar("");
+          // ignore: deprecated_member_use
+          _scaffoldKey.currentState.showSnackBar(snackBarBack);
+          // return JobPost.fromJson(jsonDecode(response.body));
+        } else {
+          // If the server did not return a 201 CREATED response,
+          // then throw an exception.
+          //throw Exception('Failed to create album.');
+          setState(() {
+            statusErr = true;
+            sStatus = "Error Can't Post Checked.!!";
+          });
+        }
+      } else {
+        //offline Update//
+        var sqlc = "update Temp2 set ";
+        sqlc += " Ause=''";
+        sqlc += ",ANotUse=''";
+        sqlc += ",ADamage=''";
+        sqlc += ",ALoss=''";
+        sqlc += ",ATransfer=''";
+        sqlc += ",LOK=''";
+        sqlc += ",LNO=''";
+        sqlc += ",LNotStick=''";
+        sqlc += ",Remark=''";
+        sqlc += ",CheckBy=''";
+        sqlc += ",CheckPoint=''";
+        sqlc += ",InputQty=1";
+        sqlc += " where CheckNo='" + dbs.checkNo + "'";
+        sqlc += " and AssetCode='" + barcode + "'";
+
+        //print(sqlc);
+        if (await sqm.updateTemp2(sqlc) > 0) {
+          showInSnackBar("");
+        } else {
+          setState(() {
+            statusErr = true;
+            sStatus = "Error Can't Post Checked.!!";
+          });
+        }
       }
     } else {
       setState(() {

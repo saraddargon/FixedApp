@@ -3,6 +3,7 @@ import 'package:fixapp/components/buttonCheck.dart';
 import 'package:fixapp/components/buttonLoad.dart';
 import 'package:fixapp/components/buttonLoadData.dart';
 import 'package:fixapp/components/buttonSetup.dart';
+import 'package:fixapp/management/sqldb.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fixapp/global.dart';
@@ -16,7 +17,40 @@ class FxApp02 extends StatefulWidget {
 
 class _FxApp02State extends State<FxApp02> {
   DBData dbs = DBData();
+  Sqlmanagement sqm = Sqlmanagement();
   @override
+  initState() {
+    super.initState();
+    getCheckNoV();
+    // feachData();
+  }
+
+  Future<void> getCheckNoV() async {
+    try {
+      List<SdbQ> sq = await sqm.getTemp1();
+      int qq = await sqm.listCountTemp2();
+      Future.delayed(Duration(milliseconds: 3000), () async {
+        // Do something
+      });
+      sq.forEach((element) {
+        setState(() {
+          dbs.users = element.userName;
+          dbs.checkNo = element.checkNo;
+          dbs.listcount = qq;
+        });
+      });
+      if (sq.length == 0) {
+        SdbQ ssq = new SdbQ(userName: "", checkNo: "");
+        if (await sqm.insertTemp1(ssq) > 0) {
+          //print('Insert OK');
+        }
+      }
+    } catch (error) {
+      //  print(error);
+      //throw Exception(error);
+    }
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       body: AnnotatedRegion<SystemUiOverlayStyle>(
@@ -60,7 +94,18 @@ class _FxApp02State extends State<FxApp02> {
                       BuildButtonLoad(),
                       SizedBox(height: 5),
                       LastCheckData(),
-                      SizedBox(height: 30),
+                      SizedBox(height: 5),
+                      Text(
+                        dbs.listcount == 0
+                            ? ''
+                            : 'Items : ' + '${dbs.listcount}',
+                        style: TextStyle(
+                            color: Colors.pink.shade500,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold),
+                      ),
+
+                      SizedBox(height: 20),
                       ButtonLoadData(),
                       ////SizedBox(height: 20),
                       ButtonCheck(),
