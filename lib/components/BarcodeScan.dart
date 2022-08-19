@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:fixapp/global.dart';
 import 'package:fixapp/management/sqldb.dart';
-import 'package:flutter/cupertino.dart';
+//import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+//import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -193,6 +193,7 @@ class _BarcodeScanState extends State<BarcodeScan> {
   initState() {
     super.initState();
     barcode = widget.tobj;
+    dbs.checkNo = dbs.checkNo.toUpperCase();
     if (barcode != '') {
       //_clearData();
       _fetchJobs(barcode);
@@ -203,7 +204,7 @@ class _BarcodeScanState extends State<BarcodeScan> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Check FixedAsset : ' + dbs.checkNo),
+        title: Text('Check FixedAsset : ' + dbs.checkNo.toUpperCase()),
         backgroundColor: Colors.blueGrey,
         actions: <Widget>[
           IconButton(
@@ -258,8 +259,8 @@ class _BarcodeScanState extends State<BarcodeScan> {
                 ),
                 keyboardType: TextInputType.text,
                 onFieldSubmitted: (String value) {
-                  barcode = value;
-                  getDataDisplay(value);
+                  barcode = value.toUpperCase();
+                  getDataDisplay(value.toUpperCase());
                 },
               ),
               SizedBox(height: 5.00),
@@ -473,9 +474,9 @@ class _BarcodeScanState extends State<BarcodeScan> {
                             setState(() {
                               aUse = value;
                               aNotUse = aUse ? false : false;
-                              aDamage = aUse ? false : false;
-                              aTransfer = aUse ? false : false;
-                              aLoss = aUse ? false : false;
+                              // aDamage = aUse ? false : false;
+                              //  aTransfer = aUse ? false : false;
+                              //  aLoss = aUse ? false : false;
                             });
                           }),
                     ],
@@ -491,9 +492,9 @@ class _BarcodeScanState extends State<BarcodeScan> {
                             setState(() {
                               aNotUse = value;
                               aUse = aNotUse ? false : false;
-                              aDamage = aNotUse ? false : false;
-                              aTransfer = aNotUse ? false : false;
-                              aLoss = aNotUse ? false : false;
+                              // aDamage = aNotUse ? false : false;
+                              // aTransfer = aNotUse ? false : false;
+                              // aLoss = aNotUse ? false : false;
                             });
                           }),
                     ],
@@ -508,10 +509,10 @@ class _BarcodeScanState extends State<BarcodeScan> {
                           onChanged: (bool value) {
                             setState(() {
                               aDamage = value;
-                              aUse = aDamage ? false : false;
-                              aNotUse = aDamage ? false : false;
-                              aTransfer = aDamage ? false : false;
-                              aLoss = aDamage ? false : false;
+                              // aUse = aDamage ? false : false;
+                              // aNotUse = aDamage ? false : false;
+                              // aTransfer = aDamage ? false : false;
+                              // aLoss = aDamage ? false : false;
                             });
                           }),
                     ],
@@ -526,10 +527,10 @@ class _BarcodeScanState extends State<BarcodeScan> {
                           onChanged: (bool value) {
                             setState(() {
                               aTransfer = value;
-                              aUse = aTransfer ? false : false;
-                              aNotUse = aTransfer ? false : false;
-                              aDamage = aTransfer ? false : false;
-                              aLoss = aTransfer ? false : false;
+                              // aUse = aTransfer ? false : false;
+                              // aNotUse = aTransfer ? false : false;
+                              // aDamage = aTransfer ? false : false;
+                              // aLoss = aTransfer ? false : false;
                             });
                           }),
                     ],
@@ -544,10 +545,10 @@ class _BarcodeScanState extends State<BarcodeScan> {
                           onChanged: (bool value) {
                             setState(() {
                               aLoss = value;
-                              aUse = aLoss ? false : false;
-                              aNotUse = aLoss ? false : false;
-                              aDamage = aLoss ? false : false;
-                              aTransfer = aLoss ? false : false;
+                              // aUse = aLoss ? false : false;
+                              // aNotUse = aLoss ? false : false;
+                              // aDamage = aLoss ? false : false;
+                              // aTransfer = aLoss ? false : false;
                             });
                           }),
                     ],
@@ -721,7 +722,8 @@ class _BarcodeScanState extends State<BarcodeScan> {
           sStatus = "Checked Completed.";
           statusErr = false;
         });
-        barcode = _value;
+        _value = _value.toLowerCase();
+        barcode = _value.toLowerCase();
         ////Start////////
 
         await _clearData();

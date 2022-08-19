@@ -1,7 +1,7 @@
 //import 'package:fixapp/components/home_screen2.dart';
 //import 'package:fixapp/global.dart';
 //import 'package:fixapp/models/checkNoList.dart';
-import 'package:flutter/cupertino.dart';
+//import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter/services.dart';
 //import 'dart:convert';

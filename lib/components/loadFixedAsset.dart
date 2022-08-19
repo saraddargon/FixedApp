@@ -1,9 +1,9 @@
 import 'package:fixapp/components/home_screen2.dart';
 import 'package:fixapp/global.dart';
 import 'package:fixapp/management/sqldb.dart';
-import 'package:flutter/cupertino.dart';
+//import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+//import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;

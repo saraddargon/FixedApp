@@ -1,6 +1,6 @@
 import 'package:fixapp/components/listCheckFixed_db.dart';
 import 'package:fixapp/global.dart';
-import 'package:flutter/cupertino.dart';
+//import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 int getListItem() {
