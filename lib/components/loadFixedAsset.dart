@@ -44,6 +44,16 @@ class _LoadCheckFixedAssetState extends State<LoadCheckFixedAsset> {
     backgroundColor: Colors.orange.shade200,
   );
 
+  final ButtonStyle style = ElevatedButton.styleFrom(
+    textStyle: const TextStyle(fontSize: 20),
+    elevation: 5.0,
+    foregroundColor: Colors.white,
+    padding: EdgeInsets.all(20),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20),
+    ),
+  );
+
   @override
   initState() {
     super.initState();
@@ -394,7 +404,8 @@ class _LoadCheckFixedAssetState extends State<LoadCheckFixedAsset> {
         content: new Text("Please.. $_value1 on Server!"),
         actions: <Widget>[
           // ignore: deprecated_member_use
-          FlatButton(
+          //(onPressed: onPressed, child: child)
+          ElevatedButton(
             child: Text('Close'),
             onPressed: () {
               Navigator.of(context).pop();
@@ -423,7 +434,7 @@ class _LoadCheckFixedAssetState extends State<LoadCheckFixedAsset> {
         ),
         actions: <Widget>[
           // ignore: deprecated_member_use
-          FlatButton(
+          ElevatedButton(
             child: Text('Close'),
             onPressed: () {
               Navigator.of(context).pop();
@@ -611,8 +622,9 @@ class _LoadCheckFixedAssetState extends State<LoadCheckFixedAsset> {
           width: double.infinity,
           // height: 80,
           // ignore: deprecated_member_use
-          child: RaisedButton(
-            elevation: 5,
+          child: ElevatedButton(
+            // elevation: 5,
+            style: style,
             onPressed: () {
               if (_checkNo.text != '') {
                 dbs.checkNo = "";
@@ -621,18 +633,18 @@ class _LoadCheckFixedAssetState extends State<LoadCheckFixedAsset> {
                 getCheckNo(context, _checkNo.text);
               }
             },
-            padding: EdgeInsets.all(20),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            color: Colors.blueGrey,
+            // padding: EdgeInsets.all(20),
+            // shape: RoundedRectangleBorder(
+            //   borderRadius: BorderRadius.circular(20),
+            // ),
+            // color: Colors.blueGrey,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text(
                   '  Load Data',
                   style: TextStyle(
-                    color: Color(0xff5ac18e),
+                    color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -645,7 +657,7 @@ class _LoadCheckFixedAssetState extends State<LoadCheckFixedAsset> {
         Container(
           alignment: Alignment.centerRight,
           // ignore: deprecated_member_use
-          child: FlatButton(
+          child: ElevatedButton(
             onPressed: () {
               Navigator.push(
                   context, MaterialPageRoute(builder: (context) => FxApp02()));

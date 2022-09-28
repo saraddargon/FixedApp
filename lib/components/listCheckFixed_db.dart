@@ -251,7 +251,9 @@ class _JobListViewDataState extends State<JobListViewData> {
     Future.delayed(Duration(milliseconds: 500), () {
       // Do something
     });
+
     DBData dbs = DBData();
+    print(dbs.checkNo);
     if (dbs.checkNo != '') {
       // dbs.checkwifi();
       //dbs.wifis = 'No';

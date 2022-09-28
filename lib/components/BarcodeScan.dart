@@ -705,8 +705,10 @@ class _BarcodeScanState extends State<BarcodeScan> {
     if (dbs.checkNo != "" && dbs.checkNo != "Error") {
       if (_value == 'SCANQR') {
         _value = await FlutterBarcodeScanner.scanBarcode(
-            "#ff6666", "Cancel", true, ScanMode.QR);
+            "#ff6666", "Cancel", true, ScanMode.Barcode);
       }
+      //print(dbs.checkNo);
+      // print(_value);
       Future.delayed(Duration(milliseconds: 1000), () {
         // Do something
       });
@@ -722,16 +724,17 @@ class _BarcodeScanState extends State<BarcodeScan> {
           sStatus = "Checked Completed.";
           statusErr = false;
         });
-        _value = _value.toLowerCase();
-        barcode = _value.toLowerCase();
+        _value = _value.toUpperCase();
+
         ////Start////////
 
         await _clearData();
+        barcode = _value.toUpperCase();
         Future.delayed(Duration(milliseconds: 500), () {
           // Do something
         });
 
-        await _fetchJobs(_value);
+        await _fetchJobs(barcode);
 
         ///////end//////////
       } else {
@@ -766,9 +769,18 @@ class _BarcodeScanState extends State<BarcodeScan> {
     }
   }
 
-  void showInSnackBar(String value) {
+  void showInSnackBar1(String value) {
     // ignore: deprecated_member_use
-    _scaffoldKey.currentState.showSnackBar(snackBar);
+    //_scaffoldKey.currentState.showSnackBar(snackBar);
+    var snackBar = SnackBar(
+      content: Text(
+        value,
+        style: TextStyle(color: Colors.black),
+      ),
+      backgroundColor: Color(0xffE5FFCC),
+      duration: const Duration(seconds: 1),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   void setValueAsstCode1(String value) {
@@ -957,7 +969,7 @@ class _BarcodeScanState extends State<BarcodeScan> {
           // If the server did return a 201 CREATED response,
           // then parse the JSON.
           //print(body);
-          showInSnackBar("");
+          showInSnackBar1("Save Data successfully.");
           // return JobPost.fromJson(jsonDecode(response.body));
         } else {
           // If the server did not return a 201 CREATED response,
@@ -988,7 +1000,7 @@ class _BarcodeScanState extends State<BarcodeScan> {
 
         //print(sqlc);
         if (await sqm.updateTemp2(sqlc) > 0) {
-          showInSnackBar("");
+          showInSnackBar1("Save Data successfully.");
         } else {
           setState(() {
             statusErr = true;
@@ -1037,8 +1049,10 @@ class _BarcodeScanState extends State<BarcodeScan> {
           // then parse the JSON.
           //showInSnackBar("");
           // ignore: deprecated_member_use
-          _scaffoldKey.currentState.showSnackBar(snackBarBack);
+          //_scaffoldKey.currentState.showSnackBar(snackBarBack);
+          showInSnackBar1("clear data successfully.");
           // return JobPost.fromJson(jsonDecode(response.body));
+
         } else {
           // If the server did not return a 201 CREATED response,
           // then throw an exception.
@@ -1068,7 +1082,7 @@ class _BarcodeScanState extends State<BarcodeScan> {
 
         //print(sqlc);
         if (await sqm.updateTemp2(sqlc) > 0) {
-          showInSnackBar("");
+          showInSnackBar1("Save Data successfully.");
         } else {
           setState(() {
             statusErr = true;
